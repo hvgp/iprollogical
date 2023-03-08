@@ -4,6 +4,7 @@
 A collection of notes concerning and exercises reflecting my understanding of logic and answer-set programming paradigms, started as part of my course in Intelligent Decision Making. My intention is to continue expanding this knowledge base in accordance with to the benefit of my own. TODO: This document (and probably the whole repository) will probably need to be decomposed once the content has expanded a bit.
 
 - [Iprollogical](#iprollogical)
+  - [Concepts \& Vernacular](#concepts--vernacular)
   - [Prolog Evaluation Procedures (Unification \& Backtracking)](#prolog-evaluation-procedures-unification--backtracking)
     - [Evaluating a Sequence of Goals](#evaluating-a-sequence-of-goals)
     - [Evaluating \& Re-evaluating a Goal](#evaluating--re-evaluating-a-goal)
@@ -18,7 +19,7 @@ A collection of notes concerning and exercises reflecting my understanding of lo
 ## Concepts & Vernacular
 
 Prolog programs comprise a collection of clauses. Clauses are terminated by a dot character, followed by at least one whitespace character. Clauses are either facts or rules:
-- Rules are of the form `head :- body.` or `consequent :- andecedent.` where `:-` is called the neck operator. Rules can be read declaratively as "the `consequent` holds if the `body` holds" or procedurally as "to satisfy the `consequent`, first satisfy the `antecedent`." The former is usually more idiomatic.
+- Rules are of the form `head :- body.` or `consequent :- andecedent.` where `:-` is called the neck operator. Rules can be read declaratively as "the `head` holds if the `body` holds" or procedurally as "to satisfy the `head`, first satisfy the `body`." The former is usually more idiomatic.
 - Facts take the form `head.` or `consequent.` and are equivalent to a rule whose antecedent always holds, i.e. `fact :- true.`
 
 The term is the sole data structure in Prolog; everything else is achieved through composition of terms, which thus provide the concrete basis for more theoretical mechanisms. These are generally described using their own less concrete, more logical or mathematical nomenclature. TODO: Colour the nodes of this chart to categorise conrete data structure terms, and more abstract logical terms.
@@ -31,18 +32,20 @@ graph TD;
   Variable --> Term;
   Atom --> Functor;
   Term --> Argument;
-  Argument --> Structure[Compound Term];
+  Argument --> Structure["Compound Term\n(Structure)"];
   Functor --> Structure;
   Structure --> Term;
-  Structure --> Clause;
+  Structure ==> Clause;
+  Structure --> List;
   Clause --> Fact;
   Clause --> Rule;
-  Fact --> Head;
+  Fact --> Database;
+  Fact --> Head["Head\n(Consequent)"];
   Rule --> Head;
-  Rule --> Body;
+  Rule --> Body["Body\n(Antecedent)"];
   Head --> Predicate;
-  Structure --> Predicate;
-  Clause --> Program;
+  Structure ==> Predicate;
+  Clause ==> Program;
 ```
 
 ## Prolog Evaluation Procedures (Unification & Backtracking)
