@@ -51,7 +51,10 @@ succeeded(Successor, Predecessor) :- archagetai(Successor), heir(Successor, Pred
     == , /== : Args identical.
     =:=, =/= : Evaluate identical nos. Also < > =< >=
     R is E   : E is no. R unbound, bound to E. Bound no, succeeds as per =:=
+    not      : Occasionally predicate instead of operator. Can redefine if desired.
 */
+iseven(N) :- M is N // 2, M =:= N * 2. % Eg.
+increase(N, M) :- M is N + 1.
 
 % Redefinition of lineage predicate using `succeeded` operator.
 succession([Final]) :- archagetai(Final).
