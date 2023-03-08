@@ -15,6 +15,36 @@ A collection of notes concerning and exercises reflecting my understanding of lo
     - [Logical Operators](#logical-operators)
     - [List Processing](#list-processing)
 
+## Concepts & Vernacular
+
+Prolog programs comprise a collection of clauses. Clauses are terminated by a dot character, followed by at least one whitespace character. Clauses are either facts or rules:
+- Rules are of the form `head :- body.` or `consequent :- andecedent.` where `:-` is called the neck operator. Rules can be read declaratively as "the `consequent` holds if the `body` holds" or procedurally as "to satisfy the `consequent`, first satisfy the `antecedent`." The former is usually more idiomatic.
+- Facts take the form `head.` or `consequent.` and are equivalent to a rule whose antecedent always holds, i.e. `fact :- true.`
+
+The term is the sole data structure in Prolog; everything else is achieved through composition of terms, which thus provide the concrete basis for more theoretical mechanisms. These are generally described using their own less concrete, more logical or mathematical nomenclature. TODO: Colour the nodes of this chart to categorise conrete data structure terms, and more abstract logical terms.
+
+```mermaid
+graph TD;
+  Number --> Constant;
+  Atom --> Constant;
+  Constant --> Term;
+  Variable --> Term;
+  Atom --> Functor;
+  Term --> Argument;
+  Argument --> Structure[Compound Term];
+  Functor --> Structure;
+  Structure --> Term;
+  Structure --> Clause;
+  Clause --> Fact;
+  Clause --> Rule;
+  Fact --> Head;
+  Rule --> Head;
+  Rule --> Body;
+  Head --> Predicate;
+  Structure --> Predicate;
+  Clause --> Program;
+```
+
 ## Prolog Evaluation Procedures (Unification & Backtracking)
 
 Charts that visualise the precedural flow of a Prolog program. Based on Figures 3.5 and 3.6 in the second edition of Bramer's *Logic Programming with Prolog* (2013). Given the processes outlined below, it stands to reason that both the order in which the clauses concerning a certain predicate and the order of goals in the antecedent of a rule occur exercise significant influence on the evaluation of any given query; a truly **declarative** program should do what it can to mitigate the effect of these circumstances, refraining from relying on them to communicate the semantics or influence the execution process for any instance of that program.
@@ -56,6 +86,7 @@ graph TD;
 
 ### Associativity Notation
 
+- TODO: `xfx`, `xfy`, `yfx`, etc.
 - `x` is an argument with strictly less precedence than the operator itself.
 - `y` is as per the above, with strictly more precedence.
 
