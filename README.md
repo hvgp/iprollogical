@@ -26,17 +26,22 @@ The term is the sole data structure in Prolog; everything else is achieved throu
 
 ```mermaid
 graph TD;
+  subgraph Concrete;
   Number --> Constant;
   Atom --> Constant;
   Constant --> Term;
   Variable --> Term;
+  Structure --> List;
+  end;
   Atom --> Functor;
   Term --> Argument;
   Argument --> Structure["Compound Term\n(Structure)"];
+  Argument --> Predicate;
   Functor --> Structure;
+  Functor --> Predicate;
+  Structure ==> Predicate;
   Structure --> Term;
   Structure ==> Clause;
-  Structure --> List;
   Clause --> Fact;
   Clause --> Rule;
   Fact --> Database;
@@ -44,7 +49,6 @@ graph TD;
   Rule --> Head;
   Rule --> Body["Body\n(Antecedent)"];
   Head --> Predicate;
-  Structure ==> Predicate;
   Clause ==> Program;
 ```
 
