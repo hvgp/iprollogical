@@ -1,51 +1,52 @@
-:- write('Anaxandridas.'). % Directive. Built-in predicate; cannot redefine. Side-effect.
+:- write('Ἀναξανδρίδας.'). % Directive. Built-in predicate; cannot redefine. Side-effect.
 
+% TODO: Move all concepts in the comments to the README and delete from the source files.
 % go :- expedience.
 
-spartan('Anaxandridas').   % Clauses; dot final. Facts; database.
-spartan('Pleistarchus').   % Fact: head / consequent.
-spartan('Leonidas').       % Rule: consequent :- body / antecedent. Neck operator.
-spartan('Pleistoanax').    % Structures; functor, args; arity. Predicate = clause, consequent: functor, arity.
+person('Ἀναξανδρίδας', 'Λακεδαίμων').   % Clauses; dot final. Facts; database.
+person('Πλείσταρχος',  'Λακεδαίμων').
+person('Πλειστοάναξ',  'Λακεδαίμων').   % Structures; functor, args; arity. Predicate = clause, head consequent: functor, arity.
+person('Λεωνίδας',     'Λακεδαίμων').
+person('Ζευξίδαμος',   'Λακεδαίμων').
+person('Ἀναξίδαμος',   'Λακεδαίμων').
+person('Ἀρχίδαμος',    'Λακεδαίμων').
+person('Ξέρξης',       'Περσίς').
 
-% Declarative: consequent satisfiable if antecedent satisfiable. Goal; subgoals.
-% Procedural: to satisfy consequent, first satisfy antecedent.
+spartan(Figure) :- person(Figure, 'Λακεδαίμων');
 
-spartan('Zeuxidamus').
-spartan('Anaxidamus').
-spartan('Archidamus').
+dynasty('Ἀναξανδρίδας', 'Ἀγιάδαι'). % User-defined predicate.
+dynasty('Πλείσταρχος',  'Ἀγιάδαι').
+dynasty('Πλειστοάναξ',  'Ἀγιάδαι').
+dynasty('Λεωνίδας',     'Ἀγιάδαι').
+dynasty('Ζευξίδαμος',   'Εὐρυποντίδαι').
+dynasty('Ἀναξίδαμος',   'Εὐρυποντίδαι').
+dynasty('Ἀρχίδαμος',    'Εὐρυποντίδαι').
 
-dynasty('Anaxandridas', 'Agiad'). % User-defined predicate.
-dynasty('Pleistarchus', 'Agiad').
-dynasty('Leonidas',     'Agiad').
-dynasty('Pleistoanax',  'Agiad').
+father('Ἀναξανδρίδας', 'Λεωνίδας').
+father('Λεωνίδας',     'Πλείσταρχος').
+father('Πλείσταρχος',  'Πλειστοάναξ').
+father('Ζευξίδαμος',   'Ἀναξίδαμος').
+father('Ἀναξίδαμος',   'Ἀρχίδαμος').
 
-dynasty('Zeuxidamus',  'Eurypontid').
-dynasty('Anaxidamus',  'Eurypontid').
-dynasty('Archidamus',  'Eurypontid').
+defeated('Λεωνίδας', 'Θερμοπυλῶν').
+defeated('Ξέρξης',   'Σαλαμίς').
 
 % Goals. Evaluated: satisfiable; unsatisfiable.
-archagetai(Person) :- spartan(Person), dynasty(Person, 'Agiad').
-archagetai(Person) :- spartan(Person), dynasty(Person, 'Eurypontid').
-
-father('Anaxandridas', 'Leonidas').
-father('Leonidas',     'Pleistarchus').
-father('Pleistarchus', 'Pleistoanax').
-father('Zeuxidamus',   'Anaxidamus').
-father('Anaxidamus',   'Archidamus').
+archagetai(Person) :- spartan(Person), dynasty(Person, 'Ἀγιάδαι').
+archagetai(Person) :- spartan(Person), dynasty(Person, 'Εὐρυποντίδαι').
 
 % Variables: bound / unbound, instantiated / uninstantiated. Clausal lexical scope.
-heir(Successor, Predecessor) :- father(Predecessor, Successor), archagetai(Predecessor).
-
 % List; structure. Consequent / head variable: universally quantified. Antecedent variable: existentially quantified.
-lineage([Solitary]) :- archagetai(Solitary).
-lineage([Reigning, Scion | Progeny]) :- heir(Scion, Reigning), lineage([Scion | Progeny]). % Direct / indirect recursion.
+
+heir(Successor, Predecessor) :- father(Predecessor, Successor), archagetai(Predecessor).
+lineage([King]) :- archagetai(King).
+lineage([King, Scion | Progeny]) :- heir(Scion, King), lineage([Scion | Progeny]). % Direct / indirect recursion.
 
 % Operator; notation. Definition: predicate, directive. Precedence, associativity, functor.
 % Infix; binary predicate: xfx, xfy, yfx. Prefix; unary: fx, fy. Postfix: unary: xf, yf.
 % Prefix; unary: fx, fy.
 succeeded(Successor, Predecessor) :- archagetai(Successor), heir(Successor, Predecessor).
 :- op(200, yfx, succeeded).
-
 /*
     =  , /=  : Args unify.
     == , /== : Args identical.
