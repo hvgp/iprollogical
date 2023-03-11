@@ -1,1 +1,1 @@
-:- write('Leonidas').
+:- write('Λεωνίδας').

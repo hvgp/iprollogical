@@ -1,1 +1,1 @@
-:- write('Pleistarchus').
+:- write('Πλείσταρχος').

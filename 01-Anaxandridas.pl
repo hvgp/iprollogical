@@ -1,11 +1,10 @@
 :- write('Ἀναξανδρίδας.'). % Directive. Built-in predicate; cannot redefine. Side-effect.
 
-% TODO: Move all concepts in the comments to the README and delete from the source files.
 % go :- expedience.
 
-person('Ἀναξανδρίδας', 'Λακεδαίμων').   % Clauses; dot final. Facts; database.
+person('Ἀναξανδρίδας', 'Λακεδαίμων').
 person('Πλείσταρχος',  'Λακεδαίμων').
-person('Πλειστοάναξ',  'Λακεδαίμων').   % Structures; functor, args; arity. Predicate = clause, head consequent: functor, arity.
+person('Πλειστοάναξ',  'Λακεδαίμων').
 person('Λεωνίδας',     'Λακεδαίμων').
 person('Ζευξίδαμος',   'Λακεδαίμων').
 person('Ἀναξίδαμος',   'Λακεδαίμων').
@@ -51,8 +50,6 @@ succeeded(Successor, Predecessor) :- archagetai(Successor), heir(Successor, Pred
     =  , /=  : Args unify.
     == , /== : Args identical.
     =:=, =/= : Evaluate identical nos. Also < > =< >=
-    R is E   : E is no. R unbound, bound to E. Bound no, succeeds as per =:=
-    not      : Occasionally predicate instead of operator. Can redefine if desired.
 */
 iseven(N) :- M is N // 2, M =:= N * 2. % Eg.
 increase(N, M) :- M is N + 1.
