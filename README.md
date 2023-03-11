@@ -147,15 +147,16 @@ graph TD;
 #### Example Implementations
 
 ```prolog
-member(Target, [Target | _]). % Can use a cut here to return only once in case of duplicate values. Without cut?
+member(Target, [Target | _]). % Can use cut to return only once in case of duplicate values. Without cut?
 member(Target, [_ | List]) :- member(Target, List).
 
 append([], BaseList, BaseList).
 append([Appended | SourceList], BaseList, [Appended | ConcatenatedList]) :-
     append(SourceList, BaseList, ConcatenatedList).
 
-delete([], _, []).
-delete([Target | List], Target, ListSansTarget) :- delete(List, Target, ListSansTarget). % TODO: Verify this is correct without cuts. Should all be mutually exclusive.
+delete([], _, []). % TODO: Verify this is correct without cuts. Should all be mutually exclusive.
+delete([Target | List], Target, ListSansTarget) :-
+    delete(List, Target, ListSansTarget).
 delete([Value | List], Target, [Value | ListSansTarget]) :-
     Value \== Target,
     delete(List, E, ListSansTarget).
