@@ -1,7 +1,7 @@
 
 # Iprollogical
 
-A collection of notes concerning and exercises reflecting my understanding of logic and answer-set programming paradigms, started as part of my course in Intelligent Decision Making. My intention is to continue expanding this knowledge base in accordance with to the benefit of my own.
+This is basically collection of notes and practice programs concerning logic and answer-set programming paradigms. It will continue to grow and change shape as we learn more.
 
 - [Iprollogical](#iprollogical)
   - [Data Types, Concepts \& Vernacular](#data-types-concepts--vernacular)
@@ -24,7 +24,7 @@ Prolog **programs** comprise a collection of **clauses**. Clauses are terminated
 
 **Terms** are the sole data structure in Prolog; everything is achieved through composition of terms, which provide the concrete basis for more theoretical mechanisms. These are generally described using their own less concrete, more logical or mathematical nomenclature (which I have attempted to depict below). Terms may be **constants** – which comprise real numbers and **atoms**, or named constants – or **compound terms**, which are also called **structures**.
 
-Compound terms are of the form `$functor(x₁, ..., xₙ)` where the **functor** is an atom, `x₁, ..., xₙ` represent **arguments** (which can be any valid terms) and `n` is the `arity` of the structure. Compound terms are used to define **predicates**; in particular, any clause whose head is a compound term is said to define a predicate.
+Compound terms are of the form `$functor(x₁, ..., xₙ)` where the **functor** is an atom, `x₁, ..., xₙ` represent **arguments** (which can be any valid terms) and `n` is the `arity` of the structure. The outermost functor of a compound term is called the **principle functor**. Compound terms are used to define **predicates**; in particular, any clause whose head is a compound term is said to define a predicate. The **mode** of an argument refers to whether or not it should be instantiated as part of a goal: `+` means it should be instantiated, `-` the opposite, and `?` either. The mode should always be annotated.
 
 ```mermaid
 graph TD;
@@ -52,7 +52,37 @@ graph TD;
   Clause ==> Program;
 ```
 
-## Prolog Evaluation Procedures (Unification & Backtracking)
+## Lists
+
+TODO
+
+## Operators
+
+An **operator** is a specialised notation using functors binary and unary predicates: they use infix notation – `X ~ Y` – in the first case, and prefix – `~X` – or postfix – `X~` – notation in the latter. They are converted back into compound terms by the interpreter, i.e. `X * Y + Z` would become `+(*(X, Y), Z)`. This process is governed by the operator's **priority**, which indicates how tightly bound an operator is to its arguments, and **associativity**. Terms can be left or right associative, and may also prohibit association. Their priority is an integer value from 1 to 1200 (directly correlated with priority) that supports the recursive derivation of the princple functor in an expression, i.e. the ordering of each operator in an expression in descending order of precedence, where the operator of lowest precedence becomes the principle functor. Operators are defined by name, priority, and **specifier**, which encodes its associativity and type of notation.
+
+```prolog
+% Respectively, left-associative and right-associative operators.
+(X * A) * B.
+X ^ (A ^ B).
+
+% Directive used to define an operator.
+:- op(+Priority, +Specifier, +Name).
+
+% Query the definition of an existing operator.
+?- current_op(?Priority, ?Specifier, ?:Name).
+```
+
+### Specifiers
+
+For all specifiers, `f` represents the operator, `x` represents an argument with strictly lower precedence than the operator, and `y` an argument with strictly more precedence.
+
+| Operator | Nonassociative | Right-associative | Left-associative |
+|----------|----------------|-------------------|------------------|
+| Infix    |`xfx`           |`xfy`              |`yfx`             |
+| Prefix   |`fx`            |`fy`               |                  |
+| Postfix  |`xf`            |                   |`yf`              |
+
+## Prolog Evaluation Procedures: Unification & Backtracking
 
 Charts that visualise the precedural flow of a Prolog program. Based on Figures 3.5 and 3.6 in the second edition of Bramer's *Logic Programming with Prolog* (2013). Given the processes outlined below, it stands to reason that both the order in which the clauses concerning a certain predicate and the order of goals in the antecedent of a rule occur exercise significant influence on the evaluation of any given query; a truly **declarative** program should do what it can to mitigate the effect of these circumstances, refraining from relying on them to communicate the semantics or influence the execution process for any instance of that program.
 
@@ -89,13 +119,7 @@ graph TD;
 ‡ Some variables may have been instantiated (or bound) as part of this step.<br>
 \* Clause succeeds immediately if it is a fact (a rule where the antecedent is always true).
 
-## Operators & Built-in Predicates
-
-### Associativity Notation
-
-- TODO: `xfx`, `xfy`, `yfx`, etc.
-- `x` is an argument with strictly less precedence than the operator itself.
-- `y` is as per the above, with strictly more precedence.
+## Built-in Operators and Predicates
 
 ### Arithmetic Operators
 
@@ -110,7 +134,7 @@ graph TD;
 |`mod`     | Modulo                |
 |`is`      | Arithmetic evaluation |
 
-- Note: `is` is a binary operator, where if the first argument (on the left) is an uninstantiated variable, it is instantiated with the numerical value evaluated from the second argument (on the right). Otherwise, if the first argument is already instantiated, `is` only succeeds if the numerical values are the same. More precisely, the second argument is evaluated numerically and *unified* with the first argument.
+- Note: `is` is a binary operator operator used to evaluate arithmetic expressions as per `?- Value is Expression`, where if the first argument `Value` is an uninstantiated variable, it is instantiated with the numerical value evaluated from the second argument `Expression`. Otherwise, if the `Value` is already instantiated, `is` only succeeds if the numerical values are the same. More precisely, the second argument is evaluated numerically and *unified* with the first argument.
 
 ### Arithmetic Predicates
 
@@ -124,17 +148,30 @@ graph TD;
 |`round\1`  | Round                 |
 |`sqrt\1`   | Square root           |
 
-### Logical Operations
+### Comparison Operators
 
-| Operator     | Operation             |
-|--------------|-----------------------|
-|`not` or `\+` | Negation              |
-|`,`           | Conjunction           |
-|`;`           | Disjunction           |
+Comparison operators are distinct for arithmetic and literal expressions. Both arguments in arithmetic expressions are always evaluated before comparison. Literal arguments are compared with respect to their lexical order.
 
-- Note: `;` is the infix disjunction operator – as per the predicate `;/2` – which represents the logical or. This can convolute the logical or semantic intention of any given clause, especially contrasted against the equivalent clause making exclusive use of conjunction. Consensus seems to be that it's best  to heavily preference the use of conjunction.
+| Operation             | Arithmetic comparison | Literal comparison |
+|-----------------------|-----------------------|--------------------|
+| Equality              | `=:=`                 |`==`
+| Inequality            | `=/=`                 |`\==`
+| Less than             | `<`                   |`@<`
+| Less than or equal    | `=<`                  |`@<=`
+| Greater than          | `>`                   |`@>`
+| Greater than or equal | `>=`                  |`@>=`
 
-### List Processing Predicates
+### Logical Operators
+
+| Operation     | Arithmetic            |
+|---------------|-----------------------|
+|`not` or `\+`  | Negation              |
+|`,`            | Conjunction           |
+|`;`            | Disjunction           |
+
+- Note: `;` is the infix disjunction operator – as per the predicate `;/2` – which represents the logical or. This can convolute the logical or semantic intention of any given clause, especially contrasted against the equivalent clause making exclusive use of conjunction. Consensus seems to be that it's best to heavily preference the use of conjunction.
+
+### List Operation Predicates
 
 | Predicate       | Functionality         |
 |-----------------|-----------------------|
@@ -147,6 +184,8 @@ graph TD;
 #### Example Implementations
 
 ```prolog
+% TODO: Move to source file?
+
 member(Target, [Target | _]). % Can use cut to return only once in case of duplicate values. Without cut?
 member(Target, [_ | List]) :- member(Target, List).
 

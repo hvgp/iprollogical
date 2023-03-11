@@ -49,5 +49,3 @@ go :- % Directive for expedience through toplevel.
     succession ['Ἀναξανδρίδας', 'Λεωνίδας', 'Πλείσταρχος', 'Πλειστοάναξ'],
     succession ['Ζευξίδαμος', 'Ἀναξίδαμος', 'Ἀρχίδαμος'].
 
-exists(X, [X | _]).
-exists(X, [_ | Y]) :- exists(X, Y).
