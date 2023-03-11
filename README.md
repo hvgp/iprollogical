@@ -134,6 +134,42 @@ graph TD;
 
 - Note: `;` is the infix disjunction operator – as per the predicate `;/2` – which represents the logical or. This can convolute the logical or semantic intention of any given clause, especially contrasted against the equivalent clause making exclusive use of conjunction. Consensus seems to be that it's best  to heavily preference the use of conjunction.
 
-### List Processing
+### List Processing Predicates
 
-- `append/3` should probably be called `concatenated` or something similar; behaves like `concatenated(PrefixList, SuffixList, ConcatenatedList)`.
+| Predicate       | Functionality         |
+|-----------------|-----------------------|
+|`member/2`       | Membership            |
+|`append/3`       | Concatenation         |
+|`delete/3`       | Deletion              |
+|`intersection/3` | Intersection          |
+|`reverse/2`      | Reversal              |
+
+#### Example Implementations
+
+```prolog
+member(Target, [Target | _]). % Can use a cut here to return only once in case of duplicate values. Without cut?
+member(Target, [_ | List]) :- member(Target, List).
+
+append([], BaseList, BaseList).
+append([Appended | SourceList], BaseList, [Appended | ConcatenatedList]) :-
+    append(SourceList, BaseList, ConcatenatedList).
+
+delete([], _, []).
+delete([Target | List], Target, ListSansTarget) :- delete(List, Target, ListSansTarget). % TODO: Verify this is correct without cuts. Should all be mutually exclusive.
+delete([Value | List], Target, [Value | ListSansTarget]) :-
+    Value \== Target,
+    delete(List, E, ListSansTarget).
+
+intersection([], _, []).
+intersection([Shared | SourceList], BaseList, [Shared | IntersectedList]) :-
+    member(Shared, BaseList),
+    intersection(SourceList, BaseList, ConcatenatedList).
+intersection([Value | SourceList], BaseList, IntersectedList) :-
+    \+ member(Value, BaseList),
+    intersection(SourceList, BaseList, IntersectedList).
+
+reverse(InitialList, ReversedList) :- reverse(InitialList, _, ReversedList).
+reverse([], ReversedList, ReversedList).
+reverse([Value | SourceList], [Value | Accumulator], ReversedList) :-
+    reverse(SourceList, [Value | Accumulator], ReversedList).
+```

@@ -1,6 +1,6 @@
 :- consult('00-Lacedaemon.pl').
 
-:- write('Ἀναξανδρίδας.'), nl. % Directive. Built-in predicate; cannot redefine. Side-effect.
+:- write('Ἀναξανδρίδας.'), nl. % Directive. Built-in predicate; cannot redefine.
 
 spartan(Figure) :- person(Figure, 'Λακεδαίμων').
 father(Father, Son) :- male(Father), parent(Father, Son).
@@ -33,7 +33,7 @@ iseven(N) :- M is N // 2, M =:= N * 2. % Eg.
 increase(N, M) :- M is N + 1.
 
 % Redefinition of lineage predicate using `succeeded` operator.
-succession([Last | []]) :-
+succession([Last]) :-
     write(Last),
     nl,
     archagetai(Last).
@@ -45,6 +45,9 @@ succession([Predecessor, Successor | Descendants]) :-
     Successor succeeded Predecessor,
     succession([Successor | Descendants]).
 :- op(200, fy, succession).
-go :-
+go :- % Directive for expedience through toplevel.
     succession ['Ἀναξανδρίδας', 'Λεωνίδας', 'Πλείσταρχος', 'Πλειστοάναξ'],
     succession ['Ζευξίδαμος', 'Ἀναξίδαμος', 'Ἀρχίδαμος'].
+
+exists(X, [X | _]).
+exists(X, [_ | Y]) :- exists(X, Y).
