@@ -4,7 +4,7 @@
 A collection of notes concerning and exercises reflecting my understanding of logic and answer-set programming paradigms, started as part of my course in Intelligent Decision Making. My intention is to continue expanding this knowledge base in accordance with to the benefit of my own.
 
 - [Iprollogical](#iprollogical)
-  - [Concepts \& Vernacular](#concepts--vernacular)
+  - [Data Types, Concepts \& Vernacular](#data-types-concepts--vernacular)
   - [Prolog Evaluation Procedures (Unification \& Backtracking)](#prolog-evaluation-procedures-unification--backtracking)
     - [Evaluating a Sequence of Goals](#evaluating-a-sequence-of-goals)
     - [Evaluating \& Re-evaluating a Goal](#evaluating--re-evaluating-a-goal)
@@ -15,7 +15,8 @@ A collection of notes concerning and exercises reflecting my understanding of lo
     - [Logical Operations](#logical-operations)
     - [List Processing](#list-processing)
 
-## Concepts & Vernacular
+
+## Data Types, Concepts & Vernacular
 
 Prolog **programs** comprise a collection of **clauses**. Clauses are terminated by a dot and at least one whitespace character. They are either facts or rules:
 - **Rules** are of the form `head :- body.` or `consequent :- andecedent.` where `:-` is called the *neck operator*. Rules can be read declaratively as "the `head` holds if the `body` holds" or procedurally as "to satisfy the `head`, first satisfy the `body`." The former is usually more idiomatic.

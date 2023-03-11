@@ -1,31 +1,9 @@
-:- write('Ἀναξανδρίδας.'). % Directive. Built-in predicate; cannot redefine. Side-effect.
+:- consult('00-Lacedaemon.pl').
 
-% go :- expedience.
+:- write('Ἀναξανδρίδας.'), nl. % Directive. Built-in predicate; cannot redefine. Side-effect.
 
-person('Ἀναξανδρίδας', 'Λακεδαίμων').
-person('Πλείσταρχος',  'Λακεδαίμων').
-person('Πλειστοάναξ',  'Λακεδαίμων').
-person('Λεωνίδας',     'Λακεδαίμων').
-person('Ζευξίδαμος',   'Λακεδαίμων').
-person('Ἀναξίδαμος',   'Λακεδαίμων').
-person('Ἀρχίδαμος',    'Λακεδαίμων').
-person('Ξέρξης',       'Περσίς').
-
-spartan(Figure) :- person(Figure, 'Λακεδαίμων');
-
-dynasty('Ἀναξανδρίδας', 'Ἀγιάδαι'). % User-defined predicate.
-dynasty('Πλείσταρχος',  'Ἀγιάδαι').
-dynasty('Πλειστοάναξ',  'Ἀγιάδαι').
-dynasty('Λεωνίδας',     'Ἀγιάδαι').
-dynasty('Ζευξίδαμος',   'Εὐρυποντίδαι').
-dynasty('Ἀναξίδαμος',   'Εὐρυποντίδαι').
-dynasty('Ἀρχίδαμος',    'Εὐρυποντίδαι').
-
-father('Ἀναξανδρίδας', 'Λεωνίδας').
-father('Λεωνίδας',     'Πλείσταρχος').
-father('Πλείσταρχος',  'Πλειστοάναξ').
-father('Ζευξίδαμος',   'Ἀναξίδαμος').
-father('Ἀναξίδαμος',   'Ἀρχίδαμος').
+spartan(Figure) :- person(Figure, 'Λακεδαίμων').
+father(Father, Son) :- male(Father), parent(Father, Son).
 
 defeated('Λεωνίδας', 'Θερμοπυλῶν').
 defeated('Ξέρξης',   'Σαλαμίς').
@@ -49,15 +27,24 @@ succeeded(Successor, Predecessor) :- archagetai(Successor), heir(Successor, Pred
 /*
     =  , /=  : Args unify.
     == , /== : Args identical.
-    =:=, =/= : Evaluate identical nos. Also < > =< >=
+    =:=, =/= : Evaluate identical nos.
 */
 iseven(N) :- M is N // 2, M =:= N * 2. % Eg.
 increase(N, M) :- M is N + 1.
 
 % Redefinition of lineage predicate using `succeeded` operator.
-succession([Final]) :- archagetai(Final).
+succession([Last | []]) :-
+    write(Last),
+    nl,
+    archagetai(Last).
 succession([Predecessor, Successor | Descendants]) :-
+    write(Predecessor), % Side effects.
+    write(' ~ '),
+    write(Successor),
+    nl,
     Successor succeeded Predecessor,
     succession([Successor | Descendants]).
-
-:- op(200, fy, succession). % Prefix operator. `succession X`.
+:- op(200, fy, succession).
+go :-
+    succession ['Ἀναξανδρίδας', 'Λεωνίδας', 'Πλείσταρχος', 'Πλειστοάναξ'],
+    succession ['Ζευξίδαμος', 'Ἀναξίδαμος', 'Ἀρχίδαμος'].
