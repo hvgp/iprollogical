@@ -180,6 +180,8 @@ Comparison operators are distinct for arithmetic and literal expressions. Both a
 |`delete/3`       | Deletion              |
 |`intersection/3` | Intersection          |
 |`reverse/2`      | Reversal              |
+|`length/2`       | Length                |
+|`quicksort/2`    | Sort                  |
 
 #### Example Implementations
 
@@ -190,7 +192,7 @@ member(Target, [Target | _]). % Can use cut to return only once in case of dupli
 member(Target, [_ | List]) :- member(Target, List).
 
 append([], BaseList, BaseList).
-append([Appended | SourceList], BaseList, [Appended | ConcatenatedList]) :-
+append([Value | SourceList], BaseList, [Value | ConcatenatedList]) :-
     append(SourceList, BaseList, ConcatenatedList).
 
 delete([], _, []). % TODO: Verify this is correct without cuts. Should all be mutually exclusive.
@@ -212,4 +214,7 @@ reverse(InitialList, ReversedList) :- reverse(InitialList, _, ReversedList).
 reverse([], ReversedList, ReversedList).
 reverse([Value | SourceList], [Value | Accumulator], ReversedList) :-
     reverse(SourceList, [Value | Accumulator], ReversedList).
+
+length([], 0). % length(+List, ?Length).
+length([_ | List], Length) :- length(List, SubLength), Length is SubLength + 1.
 ```

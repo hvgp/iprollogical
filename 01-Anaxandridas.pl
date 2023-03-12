@@ -45,7 +45,38 @@ succession([Predecessor, Successor | Descendants]) :-
     Successor succeeded Predecessor,
     succession([Successor | Descendants]).
 :- op(200, fy, succession).
+
 go :- % Directive for expedience through toplevel.
     succession ['Ἀναξανδρίδας', 'Λεωνίδας', 'Πλείσταρχος', 'Πλειστοάναξ'],
     succession ['Ζευξίδαμος', 'Ἀναξίδαμος', 'Ἀρχίδαμος'].
+
+negate(X) :- \+ X.
+:- op(900, fy, negate). % Redefining not operator.
+
+<~(X, Y) :- % Does this work?
+    number(X),
+    number(Y),
+    X < Y.
+<~(X, Y) :-
+    negate number(X),
+    negate number(Y),
+    X @< Y.
+:- op(700, xfx, <~).
+
+quicksort([], []) :- !. % Not working.
+quicksort([Head | List], SortedList) :-
+    partition(Head, List, LowerPartition, UpperPartition),
+    quicksort(LowerPartition, SortedLower),
+    quicksort(UpperPartition, SortedUpper),
+    append(SortedLower, [Head | SortedUpper], SortedList).
+
+partition(_, [], [], []) :- !. % Version without cuts?
+partition(Pivot, [Value | List], [Value | LowerPartition], UpperPartition) :-
+    precedes(Value, Pivot),
+    partition(Pivot, List, LowerPartition, UpperPartition).
+partition(Pivot, [Value | List], LowerPartition, [Value | UpperPartition]) :-
+    negate precedes(Value, Pivot),
+    partition(Pivot, List, LowerPartition, UpperPartition).
+
+precedes(First, Second) :- First <~ Second.
 
