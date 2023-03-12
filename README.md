@@ -119,6 +119,19 @@ graph TD;
 ‡ Some variables may have been instantiated (or bound) as part of this step.<br>
 \* Clause succeeds immediately if it is a fact (a rule where the antecedent is always true).
 
+## Error-Handling
+
+The built-in `catch(+Goal, ?Catcher, ?Recover)` predicate executes `Goal`, and if an error that unifies with `Catcher` is raised, proceeds to `Recover` and continues execution. Built-in predicates use `throw(+Exception)` to raise an exceptions, which returns to the invoking `catch/3` predicate. If no catch exists, execution halts and control is transferred to the user. Catchers of built in predicates are of the form `error(ErrorTerm, Information)`, where `ErrorTerm` is a description of the error, and `Information` is implementation-dependent.
+
+```prolog
+?- catch((X is 1 + Y), Error, (write(Error), nl, fail)). % Recover writes error to standard output and fails.
+   error(instantiation_error, context(system: (is)/2, _GXyz))
+   false.
+
+% Usage of the throw/1 predicate.
+panic :- throw(error('Panicking', context)). % TODO: Clarify the Information argument further.
+```
+
 ## Built-in Operators and Predicates
 
 Built-in predicates provide functionality defined by the system or implementation, and should not be redefined.
@@ -175,7 +188,7 @@ Comparison operators are distinct for arithmetic and literal expressions. Both a
 
 ### List Operation Predicates
 
-See `01-Anaxandridas.pl` for sample implementations of these predicates.
+See `01-Anaxandridas.pl` for some sample implementations of these predicates, and also the [SWI Prolog List Manipulation Documentation](https://www.swi-prolog.org/pldoc/man?section=lists). TOOD: open to the expansion of this table in future; consolidating documentation.
 
 | Predicate       | Functionality         |
 |-----------------|-----------------------|
@@ -209,4 +222,42 @@ See `01-Anaxandridas.pl` for sample implementations of these predicates.
 |-----------------|------------------------------------------------------------------------|---------------|
 |`functor/3`|`functor(+Term, ?Functor, ?Arity)` or `functor(-Term, +Functor, +Arity)`| Get the principle functor and arity of a term, or the most general term given its princple functor and arity.
 |`arg/3`|`arg(+N, +Term, ?X)`| Unifies `X` with the argument of rank `N` in `Term`.
-|`=..`|`+Term =.. ?List` or `-Term =.. +List`|*Univ* predicate; transforms a term into a corresponding list.
+|`=../2`|`+Term =.. ?List` or `-Term =.. +List`|*Univ* predicate; transforms a term into a corresponding list.
+|`name/2`|`name(?Atom, ?List)`|Converts an atom into a list of corresponding ASCII codes.
+
+## Dynamically Accessing & Updating the Database
+
+Since compilation occurs before runtime, **dynamic** predicates – those which can be altered at runtime – must be declared as such; predicates are **static** by default. Static predicates are compiled, where dynamic predicates are executed using an interpreter. Dynamic predicates can be declared using the `dynamic/1` directive, or by being declared exclusively during runtime. The directive should be used before any clauses defining the given predicate. Attempting to modify a static predicate will raise an error. Itermediate results should never be asserted; modifications to the database should only reflect a permanent change in the program's state.
+
+The `dynamic/1` directive states that a predicate exists, even if no clauses yet exist to define it. If this happens for a static predicate, an error will be raised; in the former case, however, queries will just fail silently. This is typically undesirable, so either the `:- unknown(-OldValue, +NewValue)` directive or `set_prolog_flag(+FlagName, +NewValue)` can be used to alter this behaviour. Each of these arguments can be one of three values, which behave as follows:
+
+- `warning` – evaluating an unknown predicate issues a warning and fails.
+- `error` – raises an error; default value.
+- `fail` – fails silently.
+
+```prolog
+:- unknown(X, warning).
+
+% Setting a flag as follows has the same effect.
+:- set_prolog_flag(unknown, warning).
+
+% Retrieving current flag status.
+?- current_prolog_flag(+FlagName, ?Value).
+```
+
+| Predicate | Usage | Functionality |
+|-----------|-------|---------------|
+|`clause/2` |`clause(+Head, ?Body)`| Returns the body of a clause where the head unifies with `Head`.
+|`asserta/1`|`asserta(+P)`| Adds clause `P` to the database. Inserted before other clauses of the given predicate.
+|`assertz/1`|`assertz(+P)`| As above, but inserted after other clauses.
+|`retract/1`|`retract(+P)`| Removes clause `P` of a dynamic predicate from the database.
+|`abolish/1`|`abolish(+Predicate/Arity)`| Removes all clauses of dynamic predicate `Predicate` with arity `Arity` from the database.
+
+### Lemmas, or Memo Functions
+
+TODO
+
+```prolog
+% General form of the lemma. Cut prevents backtracking. Avoid asserting rules in general.
+lemma(P) :- P, asserta((P :- !)).
+```

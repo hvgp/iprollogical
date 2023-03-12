@@ -48,8 +48,8 @@ succession([Predecessor, Successor | Descendants]) :-
 
 % List predicates. TODO: Most haven't yet been tested properly.
 
-exists(Target, [Target | _]). % Member. Can use cut to return only once in case of duplicate values. Without cut?
-exists(Target, [_ | List]) :- exists(Target, List).
+exists(Target, [Target | _]). % Member.
+exists(Target, [Value | List]) :- Value \== Target, exists(Target, List).
 
 concatenate([], BaseList, BaseList). % Append.
 concatenate([Value | SourceList], BaseList, [Value | ConcatenatedList]) :-
