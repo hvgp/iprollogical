@@ -121,6 +121,8 @@ graph TD;
 
 ## Built-in Operators and Predicates
 
+Built-in predicates provide functionality defined by the system or implementation, and should not be redefined.
+
 ### Arithmetic Operators
 
 | Operator | Operation             |
@@ -173,6 +175,8 @@ Comparison operators are distinct for arithmetic and literal expressions. Both a
 
 ### List Operation Predicates
 
+See `01-Anaxandridas.pl` for sample implementations of these predicates.
+
 | Predicate       | Functionality         |
 |-----------------|-----------------------|
 |`member/2`       | Membership            |
@@ -183,38 +187,26 @@ Comparison operators are distinct for arithmetic and literal expressions. Both a
 |`length/2`       | Length                |
 |`quicksort/2`    | Sort                  |
 
-#### Example Implementations
+### Other Built-in Predicates
 
-```prolog
-% TODO: Move to source file?
+#### Type Predicates
 
-member(Target, [Target | _]). % Can use cut to return only once in case of duplicate values. Without cut?
-member(Target, [_ | List]) :- member(Target, List).
+| Predicate       | Functionality         |
+|-----------------|-----------------------|
+|`number/1`       | Is the argument a number?
+|`integer/1`      | An integer?
+|`float/1`        | A floating-point value?
+|`atom/1`         | An atom?
+|`atomic/1`       | An atomic value; a number or an atom?
+|`var/1`          | A variable?
+|`nonvar/1`       | Anything other than a variable?
+|`compound/1`     | A compound term?
+|`ground/1`       | A ground term; all variables instantiated.
 
-append([], BaseList, BaseList).
-append([Value | SourceList], BaseList, [Value | ConcatenatedList]) :-
-    append(SourceList, BaseList, ConcatenatedList).
+#### Term Manipulation Predicates & Operators
 
-delete([], _, []). % TODO: Verify this is correct without cuts. Should all be mutually exclusive.
-delete([Target | List], Target, ListSansTarget) :-
-    delete(List, Target, ListSansTarget).
-delete([Value | List], Target, [Value | ListSansTarget]) :-
-    Value \== Target,
-    delete(List, E, ListSansTarget).
-
-intersection([], _, []).
-intersection([Shared | SourceList], BaseList, [Shared | IntersectedList]) :-
-    member(Shared, BaseList),
-    intersection(SourceList, BaseList, ConcatenatedList).
-intersection([Value | SourceList], BaseList, IntersectedList) :-
-    \+ member(Value, BaseList),
-    intersection(SourceList, BaseList, IntersectedList).
-
-reverse(InitialList, ReversedList) :- reverse(InitialList, _, ReversedList).
-reverse([], ReversedList, ReversedList).
-reverse([Value | SourceList], [Value | Accumulator], ReversedList) :-
-    reverse(SourceList, [Value | Accumulator], ReversedList).
-
-length([], 0). % length(+List, ?Length).
-length([_ | List], Length) :- length(List, SubLength), Length is SubLength + 1.
-```
+| Predicate       | Usage                                                                  | Functionality |
+|-----------------|------------------------------------------------------------------------|---------------|
+|`functor/3`|`functor(+Term, ?Functor, ?Arity)` or `functor(-Term, +Functor, +Arity)`| Get the principle functor and arity of a term, or the most general term given its princple functor and arity.
+|`arg/3`|`arg(+N, +Term, ?X)`| Unifies `X` with the argument of rank `N` in `Term`.
+|`=..`|`+Term =.. ?List` or `-Term =.. +List`|*Univ* predicate; transforms a term into a corresponding list.

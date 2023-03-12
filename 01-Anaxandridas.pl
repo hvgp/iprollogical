@@ -1,6 +1,6 @@
 :- consult('00-Lacedaemon.pl').
 
-:- write('Ἀναξανδρίδας.'), nl. % Directive. Built-in predicate; cannot redefine.
+:- write('Ἀναξανδρίδας.'), nl. % Directive.
 
 spartan(Figure) :- person(Figure, 'Λακεδαίμων').
 father(Father, Son) :- male(Father), parent(Father, Son).
@@ -46,28 +46,53 @@ succession([Predecessor, Successor | Descendants]) :-
     succession([Successor | Descendants]).
 :- op(200, fy, succession).
 
-go :- % Directive for expedience through toplevel.
-    succession ['Ἀναξανδρίδας', 'Λεωνίδας', 'Πλείσταρχος', 'Πλειστοάναξ'],
-    succession ['Ζευξίδαμος', 'Ἀναξίδαμος', 'Ἀρχίδαμος'].
+% List predicates. TODO: Most haven't yet been tested properly.
+
+exists(Target, [Target | _]). % Member. Can use cut to return only once in case of duplicate values. Without cut?
+exists(Target, [_ | List]) :- exists(Target, List).
+
+concatenate([], BaseList, BaseList). % Append.
+concatenate([Value | SourceList], BaseList, [Value | ConcatenatedList]) :-
+    concatenate(SourceList, BaseList, ConcatenatedList).
+
+purge([], _, []). % Delete. TODO: Verify this is correct without cuts. Should all be mutually exclusive.
+purge([Target | List], Target, ListSansTarget) :-
+    purge(List, Target, ListSansTarget).
+purge([Value | List], Target, [Value | ListSansTarget]) :-
+    Value \== Target,
+    purge(List, Target, ListSansTarget).
+
+shared([], _, []). % Intersection.
+shared([Shared | SourceList], BaseList, [Shared | IntersectedList]) :-
+    member(Shared, BaseList),
+    shared(SourceList, BaseList, IntersectedList).
+shared([Value | SourceList], BaseList, IntersectedList) :-
+    \+ member(Value, BaseList),
+    shared(SourceList, BaseList, IntersectedList).
+
+invert(InitialList, ReversedList) :- invert(InitialList, _, ReversedList). % Reverse.
+invert([], ReversedList, ReversedList).
+invert([Value | SourceList], [Value | Accumulator], ReversedList) :-
+    invert(SourceList, [Value | Accumulator], ReversedList).
+
+size([], 0). % Length: length(+List, ?Length).
+size([_ | List], Length) :- size(List, SubLength), Length is SubLength + 1.
 
 negate(X) :- \+ X.
 :- op(900, fy, negate). % Redefining not operator.
 
-<~(X, Y) :- % Does this work?
-    number(X),
-    number(Y),
-    X < Y.
-<~(X, Y) :-
+<=(X, Y) :- number(X), number(Y), X < Y.
+<=(X, Y) :-
     negate number(X),
     negate number(Y),
     X @< Y.
-:- op(700, xfx, <~).
+:- op(700, xfx, <=).
 
-quicksort([], []) :- !. % Not working.
-quicksort([Head | List], SortedList) :-
+quickorder([], []) :- !. % Quicksort.
+quickorder([Head | List], SortedList) :-
     partition(Head, List, LowerPartition, UpperPartition),
-    quicksort(LowerPartition, SortedLower),
-    quicksort(UpperPartition, SortedUpper),
+    quickorder(LowerPartition, SortedLower),
+    quickorder(UpperPartition, SortedUpper),
     append(SortedLower, [Head | SortedUpper], SortedList).
 
 partition(_, [], [], []) :- !. % Version without cuts?
@@ -78,5 +103,20 @@ partition(Pivot, [Value | List], LowerPartition, [Value | UpperPartition]) :-
     negate precedes(Value, Pivot),
     partition(Pivot, List, LowerPartition, UpperPartition).
 
-precedes(First, Second) :- First <~ Second.
+precedes(First, Second) :- First <= Second.
 
+% Directive for expedience through toplevel.
+test_succession :-
+    succession ['Ἀναξανδρίδας', 'Λεωνίδας', 'Πλείσταρχος', 'Πλειστοάναξ'],
+    succession ['Ζευξίδαμος', 'Ἀναξίδαμος', 'Ἀρχίδαμος'].
+
+test_sorting(X) :-
+    quickorder([
+        'Ἀναξανδρίδας',
+        'Λεωνίδας',
+        'Πλείσταρχος',
+        'Πλειστοάναξ',
+        'Ζευξίδαμος',
+        'Ἀναξίδαμος',
+        'Ἀρχίδαμος'
+    ], X).
