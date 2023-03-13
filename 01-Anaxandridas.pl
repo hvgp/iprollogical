@@ -1,6 +1,6 @@
 :- consult('00-Lacedaemon.pl').
 
-:- write('Ἀναξανδρίδας.'), nl. % Directive.
+:- write('Ἀναξανδρίδας'), nl. % Directive.
 
 spartan(Figure) :- person(Figure, 'Λακεδαίμων').
 father(Father, Son) :- male(Father), parent(Father, Son).
@@ -81,12 +81,12 @@ size([_ | List], Length) :- size(List, SubLength), Length is SubLength + 1.
 negate(X) :- \+ X.
 :- op(900, fy, negate). % Redefining not operator.
 
-<=(X, Y) :- number(X), number(Y), X < Y.
-<=(X, Y) :-
+<~(X, Y) :- number(X), number(Y), X < Y.
+<~(X, Y) :-
     negate number(X),
     negate number(Y),
     X @< Y.
-:- op(700, xfx, <=).
+:- op(700, xfx, <~).
 
 quickorder([], []) :- !. % Quicksort.
 quickorder([Head | List], SortedList) :-
@@ -103,7 +103,7 @@ partition(Pivot, [Value | List], LowerPartition, [Value | UpperPartition]) :-
     negate precedes(Value, Pivot),
     partition(Pivot, List, LowerPartition, UpperPartition).
 
-precedes(First, Second) :- First <= Second.
+precedes(First, Second) :- First <~ Second.
 
 % Directive for expedience through toplevel.
 test_succession :-
@@ -120,3 +120,15 @@ test_sorting(X) :-
         'Ἀναξίδαμος',
         'Ἀρχίδαμος'
     ], X).
+
+distance(Current, Current, _, Seen, Distance) :- length(Seen, Distance).
+distance(Current, Target, Functor, Seen, Distance) :-
+    Current \== Target,
+    Predicate =.. [Functor, Next, Current],
+    call(Predicate),
+    negate member(Next, [Current | Seen]),
+    distance(Next, Target, Functor, [Current | Seen], Distance).
+distance(Current, Target, Distance) :-
+    distance(Current, Target, sits_left,  [], Left),
+    distance(Current, Target, sits_right, [], Right),
+    Distance is min(Left, Right).
