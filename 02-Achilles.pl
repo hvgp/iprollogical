@@ -15,3 +15,15 @@ size(L, N) :- size(L, 0, N).
 % Tail recursion is converted to iteration; constant storage use.
 size([], N, N).
 size([_ | L], N1, N) :- N2 is N1 + 1, size(L, N2, N).
+
+distance(X, Y, _, S, N) :- length(S, N).
+distance(X, Y, F, S, N) :-
+    X \== Y,
+    P =.. [F, Z, X],
+    call(P),
+    negate member(Z, [X | S]),
+    distance(Z, Y, F, [X | S], N).
+distance(X, Y, N) :-
+    distance(X, Y, sits_left,  [], A),
+    distance(X, Y, sits_right, [], B),
+    N is min(A, B).

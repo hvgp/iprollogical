@@ -120,15 +120,3 @@ test_sorting(X) :-
         'Ἀναξίδαμος',
         'Ἀρχίδαμος'
     ], X).
-
-distance(Current, Current, _, Seen, Distance) :- length(Seen, Distance).
-distance(Current, Target, Functor, Seen, Distance) :-
-    Current \== Target,
-    Predicate =.. [Functor, Next, Current],
-    call(Predicate),
-    negate member(Next, [Current | Seen]),
-    distance(Next, Target, Functor, [Current | Seen], Distance).
-distance(Current, Target, Distance) :-
-    distance(Current, Target, sits_left,  [], Left),
-    distance(Current, Target, sits_right, [], Right),
-    Distance is min(Left, Right).
